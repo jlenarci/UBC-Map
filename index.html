@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+    #legend {
+        position: absolute;
+        left: 10px;
+        bottom: 30px;
+        width: 220px;
+        padding: 8px;
+        background: white;
+        font-family: Arial, sans-serif;
+        z-index: 1;
+    }
+
+    .legend-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+</style>
+<head>
+ 
+<body>
+<div id="mapid" style="width: 100vw; height: 100vh;"></div>
+<div id="legend">
+    <strong>UBC Address Types</strong>
+    <p>
+        <span class="legend-dot" style="background: #1b7837;"></span>
+        Residential
+    </p>
+    <p>
+        <span class="legend-dot" style="background: #888888;"></span>
+        Non-Residential
+    </p>
+    <p>Data: From UBC OpenGeodata</p>
+ <script type="module">
+ import * as maplibregl
+ from 'https://cdn.jsdelivr.net/npm/maplibre-gl@6.15.0/dist/maplibre-gl.mjs';
+ const map = new maplibregl.Map({
+ container: 'mapid', // the id of the div above
+ center: [-123.256113, 49.265637], // [longitude, latitude]
+ zoom: 15,
+ style: 'https://tiles.openfreemap.org/styles/positron'
+});
+window.map = map; // so that the console can find map
+const url = 'https://raw.githubusercontent.com/UBCGeodata/ubc-geospatial-opendata/885732d332a20a59143f655c83fb15e1367ebe4d/ubcv/locations/geojson/ubcv_address.geojson';
+map.on('load', function () {
+ map.addSource('adresses', {
+ type: 'geojson',
+ data: url,
+ attribution: 'Adresses: UBCGeodata'
+ });
+ const addressMarkerPaint = {
+    'circle-radius': 6,
+    'circle-color': [
+        'match',
+        ['get', 'ADDRESS_DESCRIPTOR'],
+        'Residential', '#1b7837',
+        '0', '#762a83',
+        '#888888'
+    ],
+    'circle-opacity': 0.6
+};
+ map.addLayer({
+    id: 'adresses-circles',
+    type: 'circle',
+    source: 'adresses',
+    paint: addressMarkerPaint
+});
+map.on('click', 'adresses-circles', function (e) {
+    const properties = e.features[0].properties;
+
+    const address = properties.FULL_ADDRESS || 'Address unavailable';
+    const type = properties.ADDRESS_DESCRIPTOR || 'Unknown';
+
+    new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+            '<strong>UBC Address:</strong> ' + address +
+            '<br><strong>Type:</strong> ' + type
+        )
+        .addTo(map);
+});
+
+});
+
+
+ </script>
+</body>
+</html>
