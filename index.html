@@ -73,8 +73,8 @@ map.on('load', function () {
 map.on('click', 'adresses-circles', function (e) {
     const properties = e.features[0].properties;
 
-    const address = properties.FULL_ADDRESS || 'Address unavailable';
-    const type = properties.ADDRESS_DESCRIPTOR || 'Unknown';
+    const address = properties.FULL_ADDRESS;  
+    const type = properties.ADDRESS_DESCRIPTOR;  
 
     new maplibregl.Popup()
         .setLngLat(e.lngLat)
