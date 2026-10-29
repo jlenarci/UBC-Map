@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <html>
-<style>
+<head>
+    <meta charset="utf-8" />
+    <title>We can make the paint properties depend on whether we are highlighting</title>
 
+    <!-- Load MapLibre's stylesheet (CSS). Its code (JavaScript) is loaded below, in the script. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/maplibre-gl@6.15.0/dist/maplibre-gl.css"
+    />
+<style>
     #legend {
         position: absolute;
         left: 10px;
@@ -20,11 +28,21 @@
         border-radius: 50%;
         margin-right: 8px;
     }
-</style>
+    </style>
 <head>
  
 <body>
 <div id="mapid" style="width: 100vw; height: 100vh;"></div>
+    <div id="controls" style="margin: 15px;">
+      <button id="showAllAddressesButton">Show All Addresses</button>
+
+      <span style="display: inline-block; width: 30px;"></span>
+      <input type="text" id="highligtAddressTextEntry" placeholder="e.g. Main">
+      <button id="highlightAddressButton">Highlight</button>
+    </div>
+
+    <script type="module">
+
 <div id="legend">
     <strong>UBC Address Types</strong>
     <p>
@@ -64,6 +82,23 @@ map.on('load', function () {
     ],
     'circle-opacity': 0.6
 };
+
+function onEachAddress(e) {
+    const address = e.features[0].properties;
+
+    if (address.FULL_ADDRESS) {
+        const popup = new maplibregl.Popup();
+        popup.setLngLat(e.lngLat);
+        popup.setText(address.FULL_ADDRESS);
+        popup.addTo(map);
+    }
+}
+ function addAddresses() {
+
+            if (map.getSource('addresses')) {
+                return;
+            }
+    
  map.addLayer({
     id: 'adresses-circles',
     type: 'circle',
@@ -71,23 +106,52 @@ map.on('load', function () {
     paint: addressMarkerPaint
 });
 map.on('click', 'adresses-circles', function (e) {
-    const properties = e.features[0].properties;
+    }
+        function showAllAddresses() {
+            addAddresses();
+            map.setFilter('addresses-circles', null);
 
-    const address = properties.FULL_ADDRESS || 'Address unavailable';
-    const type = properties.ADDRESS_DESCRIPTOR || 'Unknown';
+            map.setPaintProperty('addresses-circles', 'circle-color',
+                addressMarkerPaint['circle-color']
+            );
 
-    new maplibregl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(
-            '<strong>UBC Address:</strong> ' + address +
-            '<br><strong>Type:</strong> ' + type
-        )
-        .addTo(map);
-});
+            map.setPaintProperty( 'addresses-circles','circle-opacity',
+                addressMarkerPaint['circle-opacity']
+            );
+        }
 
-});
+        function highlightAddresses() {
+            addAddresses();
+            const textEntry = document.getElementById('highlightAddressesTextEntry');
+            const addressToHighlight = textEntry.value;
+            if (addressToHighlight === '') {
+                showAllAddresses();
+                return;
+            }
+            map.setFilter('addresses-circles',[ 'in', addressToHighlight,
+                    ['get', 'FULL_ADDRESS']
+                ]
+            );
 
+            map.setPaintProperty('addresses-circles', 'circle-color','#ff7f00'
+            );
 
- </script>
+            map.setPaintProperty( 'addresses-circles','circle-opacity', 0.9);
+        }
+
+        map.on('load', function () {
+            addAddresses();
+        const showAllButton = document.getElementById('showAllAddressesButton'
+            );
+
+            showAllButton.addEventListener( 'click',showAllAddresses);
+            const highlightButton = 
+  document.getElementById('highlightAddressesButton');
+            highlightButton.addEventListener('click',
+                highlightAddresses);
+        });
+
+    </script>
+
 </body>
 </html>
