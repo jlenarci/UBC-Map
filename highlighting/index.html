@@ -102,8 +102,8 @@ function onEachAddress(e) {
                 showAllAddresses();
                 return;
             }
-            map.setFilter('adresses-circles', [  'in', addressToHighlight,['to-string', 
-            ['get', 'FULL_ADDRESS']]
+           map.setFilter('adresses-circles', [ '==', ['get', 'FULL_ADDRESS'],
+           addressToHighlight
 ]);
             );
 
