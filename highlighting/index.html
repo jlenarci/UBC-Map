@@ -103,7 +103,8 @@ function onEachAddress(e) {
                 return;
             }
             map.setFilter('adresses-circles',[ 'in', addressToHighlight,
-                    ['get', 'ADDRESS_DESCRIPTOR']
+                    ['get', 'ADDRESS_DESCRIPTOR'],
+           'Residential'
                 ]
             );
 
