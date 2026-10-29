@@ -11,14 +11,10 @@
     />
 <style>
     #legend {
-        position: absolute;
-        left: 10px;
-        bottom: 30px;
         width: 220px;
         padding: 8px;
         background: white;
         font-family: Arial, sans-serif;
-        z-index: 1;
     }
 
     .legend-dot {
@@ -107,7 +103,7 @@ function onEachAddress(e) {
                 return;
             }
             map.setFilter('adresses-circles',[ 'in', addressToHighlight,
-                    ['get', 'FULL_ADDRESS']
+                    ['to-string', 'FULL_ADDRESS']
                 ]
             );
 
