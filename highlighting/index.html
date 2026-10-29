@@ -28,20 +28,17 @@
         border-radius: 50%;
         margin-right: 8px;
     }
-    </style>
-<head>
- 
+</style>
+</head>
 <body>
-<div id="mapid" style="width: 100vw; height: 100vh;"></div>
+<div id="mapid" style="width: 100%; height: 75vh;"></div>
     <div id="controls" style="margin: 15px;">
       <button id="showAllAddressesButton">Show All Addresses</button>
 
       <span style="display: inline-block; width: 30px;"></span>
-      <input type="text" id="highligtAddressTextEntry" placeholder="e.g. Main">
-      <button id="highlightAddressButton">Highlight</button>
+      <input type="text" id="highlightAddressesTextEntry" placeholder="e.g. Main">
+      <button id="highlightAddressesButton">Highlight</button>
     </div>
-
-    <script type="module">
 
 <div id="legend">
     <strong>UBC Address Types</strong>
@@ -54,6 +51,7 @@
         Non-Residential
     </p>
     <p>Data: From UBC OpenGeodata</p>
+    </div>
  <script type="module">
  import * as maplibregl
  from 'https://cdn.jsdelivr.net/npm/maplibre-gl@6.15.0/dist/maplibre-gl.mjs';
@@ -65,12 +63,6 @@
 });
 window.map = map; // so that the console can find map
 const url = 'https://raw.githubusercontent.com/UBCGeodata/ubc-geospatial-opendata/885732d332a20a59143f655c83fb15e1367ebe4d/ubcv/locations/geojson/ubcv_address.geojson';
-map.on('load', function () {
- map.addSource('adresses', {
- type: 'geojson',
- data: url,
- attribution: 'Adresses: UBCGeodata'
- });
  const addressMarkerPaint = {
     'circle-radius': 6,
     'circle-color': [
@@ -93,29 +85,15 @@ function onEachAddress(e) {
         popup.addTo(map);
     }
 }
- function addAddresses() {
-
-            if (map.getSource('addresses')) {
-                return;
-            }
-    
- map.addLayer({
-    id: 'adresses-circles',
-    type: 'circle',
-    source: 'adresses',
-    paint: addressMarkerPaint
-});
-map.on('click', 'adresses-circles', function (e) {
-    }
         function showAllAddresses() {
             addAddresses();
-            map.setFilter('addresses-circles', null);
+            map.setFilter('adresses-circles', null);
 
-            map.setPaintProperty('addresses-circles', 'circle-color',
+            map.setPaintProperty('adresses-circles', 'circle-color',
                 addressMarkerPaint['circle-color']
             );
 
-            map.setPaintProperty( 'addresses-circles','circle-opacity',
+            map.setPaintProperty( 'adresses-circles','circle-opacity',
                 addressMarkerPaint['circle-opacity']
             );
         }
@@ -128,30 +106,48 @@ map.on('click', 'adresses-circles', function (e) {
                 showAllAddresses();
                 return;
             }
-            map.setFilter('addresses-circles',[ 'in', addressToHighlight,
+            map.setFilter('adresses-circles',[ 'in', addressToHighlight,
                     ['get', 'FULL_ADDRESS']
                 ]
             );
 
-            map.setPaintProperty('addresses-circles', 'circle-color','#ff7f00'
+            map.setPaintProperty('adresses-circles', 'circle-color','#ff7f00'
             );
 
-            map.setPaintProperty( 'addresses-circles','circle-opacity', 0.9);
+            map.setPaintProperty( 'adresses-circles','circle-opacity', 0.9);
         }
 
-        map.on('load', function () {
-            addAddresses();
-        const showAllButton = document.getElementById('showAllAddressesButton'
-            );
+        function addAddresses() {
 
-            showAllButton.addEventListener( 'click',showAllAddresses);
-            const highlightButton = 
-  document.getElementById('highlightAddressesButton');
-            highlightButton.addEventListener('click',
-                highlightAddresses);
-        });
+    if (map.getSource('adresses')) {
+        return;
+    }
+
+    map.addSource('adresses', {
+        type: 'geojson',
+        data: url,
+        attribution: 'Addresses: UBCGeodata'
+    });
+
+    map.addLayer({
+        id: 'adresses-circles',
+        type: 'circle',
+        source: 'adresses',
+        paint: addressMarkerPaint
+    });
+
+    map.on('click', 'adresses-circles', onEachAddress);
+}
+
+       map.on('load', function () { addAddresses();
+       const showAllButton = 
+    document.getElementById('showAllAddressesButton');
+       showAllButton.addEventListener('click', showAllAddresses);
+       const highlightButton = document.getElementById('highlightAddressesButton');
+        highlightButton.addEventListener('click', 
+    highlightAddresses);
+});
 
     </script>
-
 </body>
 </html>
