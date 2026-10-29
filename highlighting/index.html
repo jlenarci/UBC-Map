@@ -102,10 +102,9 @@ function onEachAddress(e) {
                 showAllAddresses();
                 return;
             }
-            map.setFilter('adresses-circles',[ 'in', addressToHighlight,
-                    ['get', 'ADDRESS_DESCRIPTOR'],
-           'Residential'
-                ]
+            map.setFilter('adresses-circles', [  'in', addressToHighlight,['to-string', 
+            ['get', 'FULL_ADDRESS']]
+]);
             );
 
             map.setPaintProperty('adresses-circles', 'circle-color','#ff7f00'
