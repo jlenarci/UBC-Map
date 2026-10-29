@@ -103,7 +103,7 @@ function onEachAddress(e) {
                 return;
             }
             map.setFilter('adresses-circles',[ 'in', addressToHighlight,
-                    ['to-string', 'FULL_ADDRESS']
+                    ['get', 'FULL_ADDRESS']
                 ]
             );
 
